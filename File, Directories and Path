@@ -1,0 +1,33 @@
+with open("/Users/jerin/Downloads/Mail+Merge+Project+Start/Mail Merge Project Start/Input/Names/invited_names.txt") as names:
+    namesList = names.readlines()
+with open("/Users/jerin/Downloads/Mail+Merge+Project+Start/Mail Merge Project Start/Input/Letters/starting_letter.txt") as letter:
+    letter = letter.read()
+    for name in namesList:
+        name_without_new_line = name.strip()
+        new_letter = letter.replace("[name]", name_without_new_line)
+        with open(f"/Users/jerin/Downloads/Mail+Merge+Project+Start/Mail Merge Project Start/Output/ReadyToSend/{name_without_new_line}.txt", mode="w") as output:
+            output.write(new_letter)
+
+#############################################################################################################
+
+Starting letter below
+
+Dear [name],
+
+You are invited to my birthday party this Saturday.
+
+Hope you can make it!
+
+Jerin
+
+#############################################################################################################
+Invited names 
+
+Courtney
+Jennifer
+David
+Matthew
+Matt
+Lisa
+Gunther
+Mike
