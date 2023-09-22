@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 import random
+import json
 import pyperclip
 
 
@@ -45,15 +46,52 @@ def add():
     passInput = entryPass.get()
     emailInput = entryEmail.get()
     webInput = entryWeb.get()
+    new_dict = {
+        webInput:
+            {
+                "Email": emailInput,
+                "Password": passInput,
+             },
+    }
     if len(passInput) ==0 or len(webInput) == 0:
         messagebox.showinfo(message="Invalid Input")
     else:
         message = messagebox.askokcancel(title="Confirmation", message=f"Web: {webInput}\n Password: {passInput}\n Do you wish to continue")
         if message:
-            with open("password.txt", mode="a") as file:
-                file.write(f"{webInput} | {emailInput} | {passInput}\n")
-            entryWeb.delete(0, END)
-            entryPass.delete(0, END)
+            try:
+                with open("password.json", "r") as file:
+                    new_file = json.load(file)
+
+            except FileNotFoundError:
+                with open("password.json", mode="w") as file:
+                    json.dump(new_dict, file, indent=4)
+            else:
+                new_file.update(new_dict)
+                with open("password.json", "w") as file:
+                    json.dump(new_file, file, indent=4)
+            finally:
+                entryWeb.delete(0, END)
+                entryPass.delete(0, END)
+
+
+def search():
+    webInput = entryWeb.get()
+    try:
+        with open("password.json", mode="r") as file:
+            new_file = json.load(file)
+    except FileNotFoundError:
+        messagebox.showinfo(message="No data file found")
+    else:
+        if webInput in new_file:
+            em = new_file[webInput]["Email"]
+            password = new_file[webInput]["Password"]
+            messagebox.showinfo(message=f"Email = {em}\npassword = {password}")
+        else:
+            messagebox.showinfo(message="No data")
+
+
+
+
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -82,12 +120,14 @@ entryEmail = Entry(width=36)
 entryEmail.insert(0, "jerin@xyz.com")
 entryEmail.grid(column=1, row=2, columnspan=2)
 
-entryPass = Entry(width=18)
+entryPass = Entry(width=36)
 entryPass.grid(column=1, row=3, columnspan=1)
 
 buttonGenerate = Button(text="Generate Password", command=generate_password)
-buttonGenerate.grid(column=2, row=3)
-buttonAdd = Button(text="Add", width=31, command=add)
-buttonAdd.grid(column=1, row=4, columnspan=2)
+buttonGenerate.grid(column=3, row=3)
+buttonAdd = Button(text="Add", width=46, command=add)
+buttonAdd.grid(column=1, row=4, columnspan=3)
+buttonSearch = Button(text= "Search", width=15, command=search)
+buttonSearch.grid(column=3, row=1)
 
 window.mainloop()
